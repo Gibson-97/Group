@@ -1,0 +1,205 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Oct 23, 2026 at 11:28 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `nce_clinic`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `consultations`
+--
+
+CREATE TABLE `consultations` (
+  `consultation_id` int(11) NOT NULL,
+  `patient_id` int(11) NOT NULL,
+  `recorded_by` int(11) NOT NULL,
+  `consultation_date` datetime NOT NULL DEFAULT current_timestamp(),
+  `diagnosis` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `drugs`
+--
+
+CREATE TABLE `drugs` (
+  `drug_code` varchar(20) NOT NULL,
+  `drug_name` varchar(100) NOT NULL,
+  `current_quantity` int(11) NOT NULL DEFAULT 0,
+  `reorder_level` int(11) NOT NULL DEFAULT 0,
+  `expiry_date` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `drugs`
+--
+
+INSERT INTO `drugs` (`drug_code`, `drug_name`, `current_quantity`, `reorder_level`, `expiry_date`) VALUES
+('AMX500', 'Amoxicillin 500mg', 120, 50, '2026-12-31'),
+('ANTMAL', 'Antimalarial (AL)', 40, 30, '2026-11-15'),
+('ORS', 'Oral Rehydration Salt', 15, 20, '2026-10-30'),
+('PCM500', 'Paracetamol 500mg', 200, 80, '2027-03-01');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `patients`
+--
+
+CREATE TABLE `patients` (
+  `patient_id` int(11) NOT NULL,
+  `full_name` varchar(100) NOT NULL,
+  `date_of_birth` date DEFAULT NULL,
+  `sex` enum('M','F') DEFAULT NULL,
+  `contact` varchar(20) DEFAULT NULL,
+  `address` varchar(150) DEFAULT NULL,
+  `registered_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `prescriptions`
+--
+
+CREATE TABLE `prescriptions` (
+  `prescription_id` int(11) NOT NULL,
+  `consultation_id` int(11) NOT NULL,
+  `drug_code` varchar(20) NOT NULL,
+  `quantity` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `user_id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `full_name` varchar(100) NOT NULL,
+  `role` enum('Clinician','PharmacyAssistant','InCharge') NOT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `last_login` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`user_id`, `username`, `password_hash`, `full_name`, `role`, `is_active`, `created_at`, `last_login`) VALUES
+(1, 'admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Clinic In-Charge', 'InCharge', 1, '2026-10-23 11:27:32', NULL),
+(2, 'nurse', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'Nurse Mary', 'Clinician', 1, '2026-10-23 11:27:32', NULL),
+(3, 'pharma', '9b8769a4a742358c2a5b8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f', 'Pharmacy Assistant', 'PharmacyAssistant', 1, '2026-10-23 11:27:32', NULL);
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `consultations`
+--
+ALTER TABLE `consultations`
+  ADD PRIMARY KEY (`consultation_id`),
+  ADD KEY `patient_id` (`patient_id`),
+  ADD KEY `recorded_by` (`recorded_by`);
+
+--
+-- Indexes for table `drugs`
+--
+ALTER TABLE `drugs`
+  ADD PRIMARY KEY (`drug_code`);
+
+--
+-- Indexes for table `patients`
+--
+ALTER TABLE `patients`
+  ADD PRIMARY KEY (`patient_id`);
+
+--
+-- Indexes for table `prescriptions`
+--
+ALTER TABLE `prescriptions`
+  ADD PRIMARY KEY (`prescription_id`),
+  ADD KEY `consultation_id` (`consultation_id`),
+  ADD KEY `drug_code` (`drug_code`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`user_id`),
+  ADD UNIQUE KEY `username` (`username`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `consultations`
+--
+ALTER TABLE `consultations`
+  MODIFY `consultation_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `patients`
+--
+ALTER TABLE `patients`
+  MODIFY `patient_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `prescriptions`
+--
+ALTER TABLE `prescriptions`
+  MODIFY `prescription_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `consultations`
+--
+ALTER TABLE `consultations`
+  ADD CONSTRAINT `consultations_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`patient_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `consultations_ibfk_2` FOREIGN KEY (`recorded_by`) REFERENCES `users` (`user_id`);
+
+--
+-- Constraints for table `prescriptions`
+--
+ALTER TABLE `prescriptions`
+  ADD CONSTRAINT `prescriptions_ibfk_1` FOREIGN KEY (`consultation_id`) REFERENCES `consultations` (`consultation_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `prescriptions_ibfk_2` FOREIGN KEY (`drug_code`) REFERENCES `drugs` (`drug_code`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
